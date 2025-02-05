@@ -1,0 +1,99 @@
+/* styles.css */
+
+.recharge-container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+.customer-details {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.customer-details p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.strong {
+    font-weight: bold;
+}
+
+.upi-section {
+    background: #e9f5ff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.upi-section h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.upi-section p {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.upi-section img {
+    margin-top: 10px;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    width: 180px;
+}
+
+.recharge-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.recharge-form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.recharge-form button {
+    background: #007bff;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.recharge-form button:hover {
+    background: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .recharge-container {
+        width: 90%;
+        padding: 15px;
+    }
+    
+    .upi-section img {
+        width: 150px;
+    }
+}

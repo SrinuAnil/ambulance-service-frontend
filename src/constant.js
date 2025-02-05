@@ -1,0 +1,1 @@
+export const backend_api = "https://ambulance-server-database.onrender.com"
