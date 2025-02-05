@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import './styles.css'
 
 function Recharge() {
-    const history = useHistory();
+    const navigate = useNavigate();
     const [customer, setCustomer] = useState(null);
     const [amount, setAmount] = useState(0);
     const [transactionId, setTransactionId] = useState("");
@@ -26,7 +26,7 @@ function Recharge() {
             localStorage.setItem("customer", JSON.stringify(updatedCustomer));
             setCustomer(updatedCustomer);
             alert(`Recharge Successful! Your Transaction ID: ${transactionId}`);
-            history.push("/home");
+            navigate("/home");
         }
     };
 

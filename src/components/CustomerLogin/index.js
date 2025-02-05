@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import styled from "styled-components";
 import { backend_api } from "../../constant";
@@ -71,16 +71,14 @@ const CustomerLoginForm = () => {
     gender: "Male",
   });
   const [error, setError] = useState(null);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
-      const jwtToken = Cookies.get("customerjwtToken");
-      if (jwtToken) {
-        history.push("/home");
-      }else{
-        history.push("/customer");
-      }
-    }, [history]);
+    const jwtToken = Cookies.get("customerjwtToken");
+    if (jwtToken) {
+      navigate("/home");
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -91,9 +89,7 @@ const CustomerLoginForm = () => {
     setError(null);
 
     try {
-      const url = isLogin
-        ? backend_api+"/customerLogin"
-        : backend_api+"/register";
+      const url = isLogin ? `${backend_api}/customerLogin` : `${backend_api}/register`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -102,17 +98,15 @@ const CustomerLoginForm = () => {
       });
 
       const data = await response.json();
-      console.log(data)
+
       if (!response.ok) {
-        setError(data.error);
+        setError(data.error || "An error occurred. Please try again.");
         return;
       }
 
       localStorage.setItem("customer", JSON.stringify(data.user));
-
-
       Cookies.set("customerjwtToken", data.jwtToken, { expires: 1 });
-      history.push("/home");
+      navigate("/home");
     } catch (error) {
       setError("Something went wrong. Please try again.");
     }
@@ -151,16 +145,11 @@ const CustomerLoginForm = () => {
             required
           />
           {!isLogin && (
-          <Select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            required
-          >
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </Select>
+            <Select name="gender" value={formData.gender} onChange={handleChange} required>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </Select>
           )}
           <Button type="submit">{isLogin ? "Login" : "Signup"}</Button>
         </form>

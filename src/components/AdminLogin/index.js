@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./styles.css";
 import { backend_api } from "../../constant";
 
@@ -10,26 +10,23 @@ function AdminLogin() {
     const [error, setError] = useState("");
     const [isError, setIsError] = useState(false);
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const jwtToken = Cookies.get("admin_jwt_token");
         if (jwtToken) {
-            history.push("/dashboard");
+            navigate("/dashboard");
         }
-    }, [history]);
+    }, [navigate]);
 
     const onSubmitSuccess = (jwtToken) => {
-        Cookies.set("admin_jwt_token", jwtToken, {
-            expires: 30,
-            path: "/",
-        });
-        history.push("/dashboard");
+        Cookies.set("admin_jwt_token", jwtToken, { expires: 30, path: "/" });
+        navigate("/dashboard");
     };
 
     const onSubmitFailure = (errorMsg) => {
         setIsError(true);
-        setError(errorMsg);
+        setError(errorMsg || "Invalid credentials.");
         setUsername("");
         setPassword("");
     };
@@ -45,24 +42,22 @@ function AdminLogin() {
         const userDetails = { username, password };
         const options = {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userDetails),
         };
 
         try {
-            const url = backend_api+'/adminLogin/'
+            const url = `${backend_api}/adminLogin/`;
             const response = await fetch(url, options);
             const data = await response.json();
-            if (response.status === 200) {
+
+            if (response.ok) {
                 onSubmitSuccess(data.jwtToken);
-            } else if (response.status === 400) {
+            } else {
                 onSubmitFailure(data.error);
             }
         } catch (error) {
-            setError("Network error, please try again.");
-            setIsError(true);
+            onSubmitFailure("Network error, please try again.");
         }
     };
 
@@ -74,27 +69,25 @@ function AdminLogin() {
                     <div className="inputContainer">
                         <label className="label">Username: </label>
                         <input
-                            onChange={(e) => setUsername(e.target.value)}
-                            value={username}
-                            className="input"
                             type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="input"
                             placeholder="Enter Username"
                         />
                     </div>
                     <div className="inputContainer">
                         <label className="label">Password: </label>
                         <input
-                            onChange={(e) => setPassword(e.target.value)}
-                            value={password}
-                            className="input"
                             type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="input"
                             placeholder="Enter Password"
                         />
                     </div>
                     {isError && <p className="errorMessage">{error}</p>}
-                    <button type="submit" className="loginButton">
-                        Login
-                    </button>
+                    <button type="submit" className="loginButton">Login</button>
                 </form>
             </div>
         </div>

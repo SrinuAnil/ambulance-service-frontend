@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { useHistory } from "react-router-dom";
 import "./styles.css";
 import { backend_api } from "../../constant";
 
@@ -9,22 +9,19 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isError, setIsError] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   // Redirect to /statusOnline if already logged in
   useEffect(() => {
     const jwtToken = Cookies.get("jwt_token");
     if (jwtToken) {
-      history.push("/statusOnline");
+      navigate("/statusOnline");
     }
-  }, [history]);
+  }, [navigate]);
 
   const onSubmitSuccess = (jwtToken) => {
-    Cookies.set("jwt_token", jwtToken, {
-      expires: 30,
-      path: "/",
-    });
-    history.push("/statusOnline");
+    Cookies.set("jwt_token", jwtToken, { expires: 30, path: "/" });
+    navigate("/statusOnline");
   };
 
   const onSubmitFailure = (errorMsg) => {
@@ -42,21 +39,20 @@ function Login() {
     }
 
     const userDetails = { username, password };
-    const methods = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userDetails),
-    };
 
     try {
-      const response = await fetch(backend_api+"/login/", methods);
+      const response = await fetch(`${backend_api}/login/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userDetails),
+      });
+
       const data = await response.json();
-      if (response.status === 200) {
+
+      if (response.ok) {
         onSubmitSuccess(data.jwtToken);
-      } else if (response.status === 400) {
-        onSubmitFailure(data.error);
+      } else {
+        onSubmitFailure(data.error || "Invalid credentials");
       }
     } catch (error) {
       setError("Network error, please try again.");
@@ -69,7 +65,7 @@ function Login() {
       <div className="cardContainer">
         <h2 className="loginTitle">Login</h2>
         <div className="inputContainer">
-          <label className="label">Username: </label>
+          <label className="label">Username:</label>
           <input
             onChange={(e) => setUsername(e.target.value)}
             value={username}
@@ -79,7 +75,7 @@ function Login() {
           />
         </div>
         <div className="inputContainer">
-          <label className="label">Password: </label>
+          <label className="label">Password:</label>
           <input
             onChange={(e) => setPassword(e.target.value)}
             value={password}

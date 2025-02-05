@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom"; // ✅ Use useHistory for navigation
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./styles.css";
 
 const Amb_data = [
@@ -10,18 +10,12 @@ const Amb_data = [
 ];
 
 function BookAmb() {
-    const history = useHistory(); // ✅ Initialize useHistory
+    const navigate = useNavigate();
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const [filteredAmbulances, setFilteredAmbulances] = useState(Amb_data);
-    const [customer, setCustomer] = useState(null);
-
-    useEffect(() => {
+    const [customer, setCustomer] = useState(() => {
         const storedCustomer = localStorage.getItem("customer");
-        console.log(storedCustomer)
-        if (storedCustomer) {
-            setCustomer(JSON.parse(storedCustomer));
-        }
-    }, []);
+        return storedCustomer ? JSON.parse(storedCustomer) : null;
+    });
 
     const options = ["Oxygen(O2)", "Ventilator", "Technician", "Compounder"];
 
@@ -31,17 +25,10 @@ function BookAmb() {
         );
     };
 
-    useEffect(() => {
-        let filteredData = Amb_data;
-
-        if (selectedOptions.includes("Ventilator")) {
-            filteredData = filteredData.filter((data) => data.ventilator);
-        }
-        if (selectedOptions.includes("Technician")) {
-            filteredData = filteredData.filter((data) => data.technician);
-        }
-        setFilteredAmbulances(filteredData);
-    }, [selectedOptions]);
+    const filteredAmbulances = Amb_data.filter((data) =>
+        (!selectedOptions.includes("Ventilator") || data.ventilator) &&
+        (!selectedOptions.includes("Technician") || data.technician)
+    );
 
     const calculatePrice = (data) => {
         let updatedPrice = data.price;
@@ -53,11 +40,13 @@ function BookAmb() {
     };
 
     const handleBookNow = (data) => {
-        const totalPrice = calculatePrice(data);
+        if (!customer) {
+            alert("Please log in to proceed with the booking.");
+            return;
+        }
 
-        // ✅ Navigate to Payment Page with State Data
-        history.push({
-            pathname: "/payment",
+        const totalPrice = calculatePrice(data);
+        navigate("/payment", {
             state: { selectedAmbulance: data, selectedOptions, totalPrice, balance: customer.topup },
         });
     };
@@ -68,8 +57,7 @@ function BookAmb() {
                 <h2>🚑 Book an Ambulance</h2>
                 {customer ? (
                     <div className="customer-details">
-                        <p><strong>Hello, </strong> {customer.name}</p>
-                        {/* <p><strong>Email:</strong> {customer.email}</p> */}
+                        <p><strong>Hello,</strong> {customer.name}</p>
                         <p><strong>Card Balance:</strong> ${customer.topup}</p>
                     </div>
                 ) : (
