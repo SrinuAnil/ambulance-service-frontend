@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import Modal from "react-modal";
 import "./styles.css";
+import Cookies from "js-cookie";
 import { backend_api } from "../../constant";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [isOpen, setIsOpen] = useState(false);
   const [bookings, setBookings] = useState([]);
+  const navigate = useNavigate()
 
     useEffect(() => {
         fetch(backend_api+"/api/bookings")
@@ -17,10 +20,15 @@ function Dashboard() {
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
+  const onLogoutClick = () =>{
+    Cookies.remove("admin_jwt_token")
+    navigate("/")
+  }
+
   return (
     <div className="dashboard-container">
       <nav className="navbar">
-        <div className="logo">S</div>
+        <div className="logo"><button onClick={openModal}>S</button></div>
         <div className="nav-links">
           {["D", "S", "C", "M", "C", "S"].map((item, index) => (
             <button key={index} className="nav-item">
@@ -28,7 +36,7 @@ function Dashboard() {
             </button>
           ))}
         </div>
-        <div className="logout">L</div>
+        <div className="logout" onClick={onLogoutClick}>L</div>
       </nav>
 
       <main className="dashboard-content">

@@ -10,15 +10,15 @@ function PaymentPage() {
     const [paymentStatus, setPaymentStatus] = useState("");
     const [error, setError] = useState("");
 
-    const { selectedAmbulance, selectedOptions, totalPrice, balance } = location.state || {};
-    const [userBalance, setUserBalance] = useState(balance);
+    const { selectedAmbulance, selectedOptions, totalPrice, customer } = location.state || {};
+    const [userBalance, setUserBalance] = useState(customer.topup);
 
     if (!selectedAmbulance) {
         return <p>No ambulance selected. Please go back and choose one.</p>;
     }
 
     const handlePayment = async () => {
-        console.log(selectedAmbulance, selectedOptions, totalPrice);
+        console.log(userBalance);
 
         const bookingData = {
             userId: "1",
@@ -37,6 +37,9 @@ function PaymentPage() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(bookingData),
                 });
+
+                const updatedCustomer = { ...customer, topup: customer.topup - parseFloat(totalPrice) };
+                localStorage.setItem("customer", JSON.stringify(updatedCustomer));
 
                 if (response.ok) {
                     setIsPaid(true);

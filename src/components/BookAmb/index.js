@@ -47,7 +47,7 @@ function BookAmb() {
 
         const totalPrice = calculatePrice(data);
         navigate("/payment", {
-            state: { selectedAmbulance: data, selectedOptions, totalPrice, balance: customer.topup },
+            state: { selectedAmbulance: data, selectedOptions, totalPrice, customer},
         });
     };
 

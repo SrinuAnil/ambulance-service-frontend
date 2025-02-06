@@ -22,7 +22,7 @@ function Recharge() {
         }
 
         if (customer) {
-            const updatedCustomer = { ...customer, balance: customer.topup + parseFloat(amount) };
+            const updatedCustomer = { ...customer, topup: customer.topup + parseFloat(amount) };
             localStorage.setItem("customer", JSON.stringify(updatedCustomer));
             setCustomer(updatedCustomer);
             alert(`Recharge Successful! Your Transaction ID: ${transactionId}`);
@@ -36,8 +36,7 @@ function Recharge() {
             {customer ? (
                 <div className="customer-details">
                     <p><strong>Name:</strong> {customer.name}</p>
-                    <p><strong>Email:</strong> {customer.email}</p>
-                    <p><strong>Current Balance:</strong> ${customer.balance}</p>
+                    <p><strong>Current Balance:</strong> ${customer.topup}</p>
                 </div>
             ) : (
                 <p>Please log in to recharge your balance.</p>
