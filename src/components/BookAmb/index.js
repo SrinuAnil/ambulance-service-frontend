@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./styles.css";
 
@@ -14,10 +14,15 @@ function BookAmb() {
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [customer, setCustomer] = useState(() => {
         const storedCustomer = localStorage.getItem("customer");
+        // console.log(storedCustomer, JSON.parse(storedCustomer).phoneNumber)
         return storedCustomer ? JSON.parse(storedCustomer) : null;
     });
 
     const options = ["Oxygen(O2)", "Ventilator", "Technician", "Compounder"];
+
+    // useEffect(() => {
+    //     const user_id 
+    // })
 
     const onCheckboxChange = (option) => {
         setSelectedOptions((prev) =>

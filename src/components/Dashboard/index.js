@@ -28,7 +28,7 @@ function Dashboard() {
   return (
     <div className="dashboard-container">
       <nav className="navbar">
-        <div className="logo"><button onClick={openModal}>S</button></div>
+        <div className="logo"><button>S</button></div>
         <div className="nav-links">
           {["D", "S", "C", "M", "C", "S"].map((item, index) => (
             <button key={index} className="nav-item">
