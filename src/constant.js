@@ -1,1 +1,1 @@
-export const backend_api = "https://ambulace-service-backend-1.onrender.com"
+export const backend_api = "http://localhost:3001/"

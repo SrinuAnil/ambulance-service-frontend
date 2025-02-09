@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import "./styles.css";
 import { backend_api } from "../../constant";
+
+const GOOGLE_MAPS_API_KEY = "AIzaSyAUYtGJqbjfbM31hlUtyZot7dr6GizJh0o";
 
 function PaymentPage() {
     const location = useLocation();
@@ -15,13 +18,16 @@ function PaymentPage() {
     const [newAddress, setNewAddress] = useState("");
     const [selectedAddress, setSelectedAddress] = useState("");  // Initially no address selected
     const [addresses, setAddresses] = useState(customer?.addresses || []);
+    const [fromLocation, setFromLocation] = useState(null);
+    const [toLocation, setToLocation] = useState(null);
+    const [mapModal, setMapModal] = useState({ open: false, type: null });
 
     if (!selectedAmbulance) {
         return <p>No ambulance selected. Please go back and choose one.</p>;
     }
 
     const handlePayment = async () => {
-        if (!selectedAddress) {
+        if (!selectedAddress || !fromLocation || !toLocation) {
             setError("Please select an address");
             return;
         }
@@ -32,6 +38,8 @@ function PaymentPage() {
             ambulanceName: selectedAmbulance.name,
             totalPrice,
             location: selectedAddress,
+            fromLocation,
+            toLocation,
             timestamp: new Date().toISOString(),
             time: new Date().getTime(),
         };
@@ -62,6 +70,19 @@ function PaymentPage() {
         }
     };
 
+    const openMapModal = (type) => {
+        setMapModal({ open: true, type });
+    };
+
+    const handleLocationSelect = (lat, lng) => {
+        if (mapModal.type === "from") {
+            setFromLocation({ latitude: lat, longitude: lng });
+        } else {
+            setToLocation({ latitude: lat, longitude: lng });
+        }
+        setMapModal({ open: false, type: null });
+    };
+
     const handleAddAddress = () => {
         if (newAddress.trim() !== "") {
             setAddresses([...addresses, newAddress]);
@@ -77,6 +98,7 @@ function PaymentPage() {
 
             {/* Address Selection Dropdown */}
             <label>Select Address:</label>
+
             <select value={selectedAddress} onChange={(e) => setSelectedAddress(e.target.value)}>
                 <option value="" disabled>
                     Choose an Address
@@ -94,6 +116,21 @@ function PaymentPage() {
 
             {/* Add Address Button */}
             <button onClick={() => setShowModal(true)}>+ Add Address</button>
+
+            {/* Location Selection */}
+            <div>
+                <label>From Location:</label>
+                <button onClick={() => openMapModal("from")}>
+                    {fromLocation ? `Lat: ${fromLocation.latitude}, Lng: ${fromLocation.longitude}` : "Select Location"}
+                </button>
+            </div>
+
+            <div>
+                <label>To Location:</label>
+                <button onClick={() => openMapModal("to")}>
+                    {toLocation ? `Lat: ${toLocation.latitude}, Lng: ${toLocation.longitude}` : "Select Location"}
+                </button>
+            </div>
 
             {/* Address Modal */}
             {showModal && (
@@ -148,6 +185,26 @@ function PaymentPage() {
                 <p>
                     {error}: <span><a href="/recharge">click here</a></span> to recharge
                 </p>
+            )}
+
+            {/* Google Maps Modal */}
+            {mapModal.open && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h3>Select {mapModal.type === "from" ? "From" : "To"} Location</h3>
+                        <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+                            <GoogleMap
+                                mapContainerStyle={{ width: "100%", height: "400px" }}
+                                center={{ lat: 20.5937, lng: 78.9629 }}
+                                zoom={5}
+                                onClick={(e) => handleLocationSelect(e.latLng.lat(), e.latLng.lng())}
+                            >
+                                <Marker position={{ lat: 20.5937, lng: 78.9629 }} />
+                            </GoogleMap>
+                        </LoadScript>
+                        <button onClick={() => setMapModal({ open: false, type: null })}>Close</button>
+                    </div>
+                </div>
             )}
         </div>
     );

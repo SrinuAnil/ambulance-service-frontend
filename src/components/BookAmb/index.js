@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from 'react-sidebar';
 import "./styles.css";
+import SidebarContainer from "../Sidebar";
 
 const Amb_data = [
     { id: 1, imgUrl: "https://www.cityambulanceservice.in/wp-content/uploads/2019/11/cropped-0000000.jpg", name: "Omni Ambulance", price: 1000, oxygen: 200, ventilator: false, compounder: 300 },
@@ -12,17 +14,13 @@ const Amb_data = [
 function BookAmb() {
     const navigate = useNavigate();
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const [customer, setCustomer] = useState(() => {
+    const [sidebarOpen, setSidebarOpen] = useState(false);    const [customer] = useState(() => {
         const storedCustomer = localStorage.getItem("customer");
         // console.log(storedCustomer, JSON.parse(storedCustomer).phoneNumber)
         return storedCustomer ? JSON.parse(storedCustomer) : null;
     });
 
     const options = ["Oxygen(O2)", "Ventilator", "Technician", "Compounder"];
-
-    // useEffect(() => {
-    //     const user_id 
-    // })
 
     const onCheckboxChange = (option) => {
         setSelectedOptions((prev) =>
@@ -58,16 +56,34 @@ function BookAmb() {
 
     return (
         <div className="amb-booking-container">
+            <nav>
+                    <div className="customer-detail">
+                        <div>
+                        </div>
+                    <div>
+                        <Sidebar
+                            sidebar={<SidebarContainer />}
+                            open={sidebarOpen}
+                            onSetOpen={setSidebarOpen}
+                            styles={{ sidebar: { background: "white", width: "250px" } }}
+                        >
+                            <div className="home-navbar">
+                        <button className="profile-container" onClick={() => setSidebarOpen(true)}>
+                                {customer.name[0].toUpperCase()}    
+                        </button>
+                        <div>
+                            <></>
+                        </div>
+                            </div>
+                        
+                        </Sidebar>
+                            
+                        </div>
+                    </div>
+            </nav>
             <div className="amb-card-container">
                 <h2>🚑 Book an Ambulance</h2>
-                {customer ? (
-                    <div className="customer-details">
-                        <p><strong>Hello,</strong> {customer.name}</p>
-                        <p><strong>Card Balance:</strong> ${customer.topup}</p>
-                    </div>
-                ) : (
-                    <p>Please log in to book an ambulance.</p>
-                )}
+                
                 <p>Select Additional Services:</p>
                 <div className="checkbox-container">
                     {options.map((option, index) => (
