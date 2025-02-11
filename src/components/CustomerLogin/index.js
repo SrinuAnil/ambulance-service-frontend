@@ -69,6 +69,7 @@ const CustomerLoginForm = () => {
     phoneNumber: "",
     password: "",
     gender: "Male",
+    date: new Date().toISOString()
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();

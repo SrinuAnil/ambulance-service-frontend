@@ -11,6 +11,9 @@ import AdminLogin from "./components/AdminLogin";
 // import SignupPage from "./components/SignUpPage";
 import CustomerLoginForm from "./components/CustomerLogin";
 import Recharge from "./components/RechargePage";
+import AccountPage from "./components/AccountPage";
+import TransactionPage from "./components/Transactions";
+import BookingPage from "./components/BookingData";
 
 function App() {
   return (
@@ -22,6 +25,9 @@ function App() {
         {/* <Route path="/signUpPage" element={<SignupPage />} /> */}
         <Route path="/payment" element={<CustomerProtectedRoute><PaymentPage /></CustomerProtectedRoute>} />
         <Route path="/recharge" element={<CustomerProtectedRoute><Recharge /></CustomerProtectedRoute>} />
+        <Route path="/account" element={<CustomerProtectedRoute><AccountPage /></CustomerProtectedRoute>} />
+        <Route path="/transactions" element={<CustomerProtectedRoute><TransactionPage /></CustomerProtectedRoute>} />
+        <Route path="/booking" element={<CustomerProtectedRoute><BookingPage /></CustomerProtectedRoute>} />
         <Route path="/home" element={<CustomerProtectedRoute><BookAmb /></CustomerProtectedRoute>} />
         <Route path="/statusOnline" element={<ProtectedRoute><CaptainHome /></ProtectedRoute>} />
         <Route path="/admin" element={<AdminLogin />} />

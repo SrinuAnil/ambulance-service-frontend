@@ -20,43 +20,10 @@
     width: 100%;
     max-width: 320px;
     padding: 20px;
-    background: #fff;
+    /* background: #fff; */
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
-
-.sidebar {
-    width: 250px;
-    height: 100vh;
-    background-color: #007bff;
-    color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .sidebar h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .sidebar ul li {
-    padding: 10px;
-    cursor: pointer;
-    text-align: center;
-    border-radius: 5px;
-    transition: background 0.9s ease;
-  }
-  
-  .sidebar ul li:hover {
-    background-color: #0056b3;
-  }
 
 .customer-detail {
     background: #f8f9fa;
@@ -68,6 +35,33 @@
     justify-content: space-between;
     align-items: center;
 }
+
+.sidebar-toggle {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    /* color: white; */
+    z-index: 1000;
+  }
+
+.bm-burger-button {
+    display: none;
+  }
+  
+  .bm-menu {
+    font-size: 1.2rem;
+  }
+  
+  .menu-item {
+    display: block;
+    color: white;
+    padding: 10px 0;
+    text-decoration: none;
+  }
+  
 
 .profile-container{
     background-color: #4caf50;

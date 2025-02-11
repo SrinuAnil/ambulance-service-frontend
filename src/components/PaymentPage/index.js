@@ -27,7 +27,7 @@ function PaymentPage() {
     }
 
     const handlePayment = async () => {
-        if (!selectedAddress || !fromLocation || !toLocation) {
+        if (!selectedAddress) {
             setError("Please select an address");
             return;
         }
