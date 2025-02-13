@@ -50,6 +50,11 @@ const Button = styled.button`
   &:hover {
     background: #0056b3;
   }
+
+  &:disabled {
+    background:rgb(140, 143, 146);
+    cursor: not-allowed;
+  }
 `;
 
 const SwitchButton = styled.p`
@@ -73,6 +78,7 @@ const CustomerLoginForm = () => {
   });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const jwtToken = Cookies.get("customerjwtToken");
@@ -88,6 +94,7 @@ const CustomerLoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true)
 
     try {
       const url = isLogin ? `${backend_api}/customerLogin` : `${backend_api}/register`;
@@ -101,6 +108,7 @@ const CustomerLoginForm = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        setIsLoading(false)
         setError(data.error || "An error occurred. Please try again.");
         return;
       }
@@ -109,6 +117,7 @@ const CustomerLoginForm = () => {
       Cookies.set("customerjwtToken", data.jwtToken, { expires: 1 });
       navigate("/home");
     } catch (error) {
+      setIsLoading(false)
       setError("Something went wrong. Please try again.");
     }
   };
@@ -152,7 +161,7 @@ const CustomerLoginForm = () => {
               <option value="Other">Other</option>
             </Select>
           )}
-          <Button type="submit">{isLogin ? "Login" : "Signup"}</Button>
+          <Button disabled={isLoading} type="submit">{isLogin ? `${isLoading ? "Processing..." : "Login"}` : `${isLoading ? "Processing" : "Signup"}`}</Button>
         </form>
         <SwitchButton onClick={() => setIsLogin(!isLogin)}>
           {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}

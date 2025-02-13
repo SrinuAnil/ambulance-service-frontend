@@ -9,6 +9,7 @@ function AdminLogin() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isError, setIsError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false)
 
     const navigate = useNavigate();
 
@@ -20,12 +21,14 @@ function AdminLogin() {
     }, [navigate]);
 
     const onSubmitSuccess = (jwtToken) => {
+        setIsLoading(false)
         Cookies.set("admin_jwt_token", jwtToken, { expires: 30, path: "/" });
         navigate("/dashboard");
     };
 
     const onSubmitFailure = (errorMsg) => {
         setIsError(true);
+        setIsLoading(false)
         setError(errorMsg || "Invalid credentials.");
         setUsername("");
         setPassword("");
@@ -39,6 +42,7 @@ function AdminLogin() {
             return;
         }
 
+        setIsLoading(true)
         const userDetails = { username, password };
         const options = {
             method: "POST",
@@ -87,7 +91,9 @@ function AdminLogin() {
                         />
                     </div>
                     {isError && <p className="errorMessage">{error}</p>}
-                    <button type="submit" className="loginButton">Login</button>
+                    <button className="loginButton" type="submit" disabled={isLoading}>
+                    {isLoading ? "Processing..." : "Login"}
+                </button>
                 </form>
             </div>
         </div>

@@ -58,16 +58,7 @@ function BookAmb() {
 
     return (
         <>
-        <div className="">
-            <button className="sidebar-toggle" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <FaTimes size={28} /> : <FaBars size={28} />}
-        </button>
-
-        {/* Sidebar Menu */}
-        <Menu isOpen={isOpen} onStateChange={({ isOpen }) => setIsOpen(isOpen)}>
-            <SidebarContainer />
-        </Menu>
-            </div>
+        <SidebarContainer />
         <div className="amb-booking-container">
             
             <div className="amb-card-container">
@@ -76,7 +67,7 @@ function BookAmb() {
                 {customer ? (
                     <div className="customer-detail">
                         <p><strong>Hello,</strong> {customer.name}</p>
-                        <p><strong>Card Balance:</strong> ${customer.topup}</p>
+                        <p><strong>Card Balance:</strong> ₹ {customer.topup}</p>
                         
                     </div>
                 ) : (
@@ -104,7 +95,7 @@ function BookAmb() {
                         <img src={data.imgUrl} alt={data.name} className="amb-pic" />
                         <div className="amb-details">
                             <p className="amb-name">{data.name}</p>
-                            <p>Price: <strong>${calculatePrice(data)}</strong></p>
+                            <p>Price: <strong>₹ {calculatePrice(data)}</strong></p>
                             <button className="amb-booking-button" onClick={() => handleBookNow(data)}>Book Now</button>
                         </div>
                     </div>

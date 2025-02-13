@@ -1,26 +1,31 @@
-import React, { useState } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
-import {slide as Menu } from "react-burger-menu";
+import React from "react";
 import styled from "styled-components";
-import SidebarContainer from "../Sidebar";
+import SidebarContent from '../Sidebar';
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 50px;
-  height: 100vh;
-  background-color: #f4f4f4;
+  width: 90%;
+  max-width: 1000px;
+  margin: 80px auto;
+  text-align: center;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+`;
+
+const TableWrapper = styled.div`
+  overflow-x: auto;
 `;
 
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  
+  white-space: nowrap;
+
   th, td {
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 12px;
     text-align: center;
   }
   
@@ -36,104 +41,71 @@ const Table = styled.table`
   tr:hover {
     background: #ddd;
   }
+
+  .credit {
+    color: green;
+    font-weight: bold;
+  }
+
+  .debit {
+    color: red;
+    font-weight: bold;
+  }
+
+  @media (max-width: 768px) {
+    th, td {
+      padding: 8px;
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    th, td {
+      padding: 6px;
+      font-size: 12px;
+    }
+  }
 `;
 
-const ToggleButton = styled.button`
-    position: fixed;
-    left: 20px;
-    top: 20px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    /* color: white; */
-    z-index: 1000;
-`
-
 const BookingPage = () => {
-  const [isOpen, setIsOpen] = useState(false)
-
   const bookings = [
-    {
-      id: 1,
-      ambulanceName: "City Emergency",
-      amount: 1500,
-      date: "2024-02-05",
-      fromLocation: "Downtown Hospital",
-      toLocation: "Green Valley Clinic",
-    },
-    {
-      id: 2,
-      ambulanceName: "Rapid Response",
-      amount: 1800,
-      date: "2024-02-06",
-      fromLocation: "Sunrise Apartments",
-      toLocation: "Central Health Center",
-    },
-    {
-      id: 3,
-      ambulanceName: "LifeCare Express",
-      amount: 2000,
-      date: "2024-02-07",
-      fromLocation: "Old Town",
-      toLocation: "Metro City Hospital",
-    },
-    {
-      id: 4,
-      ambulanceName: "Quick Med",
-      amount: 1700,
-      date: "2024-02-08",
-      fromLocation: "North Park",
-      toLocation: "St. Mary's Hospital",
-    },
-    {
-      id: 5,
-      ambulanceName: "Emergency Aid",
-      amount: 1900,
-      date: "2024-02-09",
-      fromLocation: "Lake View Residency",
-      toLocation: "City General Hospital",
-    },
+    { id: 1, ambulanceName: "City Emergency", amount: 1500, date: "2024-02-05", from: "Downtown Hospital", to: "Green Valley Clinic" },
+    { id: 2, ambulanceName: "Rapid Response", amount: 1800, date: "2024-02-06", from: "Sunrise Apartments", to: "Central Health Center" },
+    { id: 3, ambulanceName: "LifeCare Express", amount: 2000, date: "2024-02-07", from: "Old Town", to: "Metro City Hospital" },
   ];
 
   return (
     <>
-    <div className="">
-        <ToggleButton onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <FaTimes size={28} /> : <FaBars size={28} />}
-        </ToggleButton>
-
-        {/* Sidebar Menu */}
-        <Menu isOpen={isOpen} onStateChange={({ isOpen }) => setIsOpen(isOpen)}>
-            <SidebarContainer />
-        </Menu>
-        </div>
-    <Container>
-      <h2>Booking History</h2>
-      <Table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Ambulance Name</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>From Location</th>
-            <th>To Location</th>
-          </tr>
-        </thead>
-        <tbody>
-          {bookings.map((booking) => (
-            <tr key={booking.id}>
-              <td>{booking.id}</td>
-              <td>{booking.ambulanceName}</td>
-              <td>${booking.amount.toFixed(2)}</td>
-              <td>{booking.date}</td>
-              <td>{booking.fromLocation}</td>
-              <td>{booking.toLocation}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </Container>
+      <SidebarContent />
+      <Container>
+        <h2>Booking History</h2>
+        <TableWrapper>
+          <Table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ambulance</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>From</th>
+                <th>To</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map((booking) => (
+                <tr key={booking.id}>
+                  <td>{booking.id}</td>
+                  <td>{booking.ambulanceName}</td>
+                  <td>${booking.amount.toFixed(2)}</td>
+                  <td>{booking.date}</td>
+                  <td>{booking.from}</td>
+                  <td>{booking.to}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </TableWrapper>
+      </Container>
     </>
   );
 };

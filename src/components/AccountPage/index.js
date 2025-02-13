@@ -66,16 +66,7 @@ const AccountPage = () => {
 
   return (
     <>
-    <div className="">
-            <ToggleButton onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <FaTimes size={28} /> : <FaBars size={28} />}
-        </ToggleButton>
-
-        {/* Sidebar Menu */}
-        <Menu isOpen={isOpen} onStateChange={({ isOpen }) => setIsOpen(isOpen)}>
-            <SidebarContainer />
-        </Menu>
-        </div>
+    <SidebarContainer />
     <Container>
       
       <Card>

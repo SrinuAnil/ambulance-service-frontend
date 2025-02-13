@@ -1,80 +1,83 @@
 import React from "react";
 import styled from "styled-components";
+import SidebarContainer from "../Sidebar";
+
+const TransactionPage = () => {
+  const transactions = [
+    { id: 1, type: "Credit", amount: 2000, date: "2024-02-05", description: "Recharge" },
+    { id: 2, type: "Debit", amount: 1500, date: "2024-02-06", description: "Booking" },
+  ];
+
+  return (
+    <>
+      <SidebarContainer />
+      <Container>
+        <h2>Transaction History</h2>
+        <Table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map((transaction) => (
+              <tr key={transaction.id}>
+                <td>{transaction.id}</td>
+                <td className={transaction.type === "Credit" ? "credit" : "debit"}>
+                  {transaction.type}
+                </td>
+                <td>${transaction.amount.toFixed(2)}</td>
+                <td>{transaction.date}</td>
+                <td>{transaction.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Container>
+    </>
+  );
+};
 
 const Container = styled.div`
-  width: 80%;
-  margin: 40px auto;
+  margin: 80px auto;
+  width: 90%;
+  max-width: 800px;
   text-align: center;
   background: #f8f9fa;
   padding: 20px;
   border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 `;
 
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  
+
   th, td {
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 12px;
     text-align: center;
   }
-  
+
   th {
     background: #007bff;
     color: white;
   }
 
-  tr.credit {
-    background: #d4edda;
+  .credit {
+    color: green;
+    font-weight: bold;
   }
 
-  tr.debit {
-    background: #f8d7da;
-  }
-
-  .status {
+  .debit {
+    color: red;
     font-weight: bold;
   }
 `;
-
-const TransactionPage = () => {
-  const transactions = [
-    { id: 1, type: "Recharge", amount: 500, date: "2024-02-05", status: "Credit" },
-    { id: 2, type: "Booking", amount: 1200, date: "2024-02-06", status: "Debit" },
-    { id: 3, type: "Recharge", amount: 800, date: "2024-02-07", status: "Credit" },
-    { id: 4, type: "Booking", amount: 950, date: "2024-02-08", status: "Debit" },
-    { id: 5, type: "Recharge", amount: 300, date: "2024-02-09", status: "Credit" },
-  ];
-
-  return (
-    <Container>
-      <h2>Transaction History</h2>
-      <Table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Type</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map((txn) => (
-            <tr key={txn.id} className={txn.status === "Credit" ? "credit" : "debit"}>
-              <td>{txn.id}</td>
-              <td>{txn.type}</td>
-              <td>${txn.amount.toFixed(2)}</td>
-              <td>{txn.date}</td>
-              <td className="status">{txn.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </Container>
-  );
-};
 
 export default TransactionPage;
