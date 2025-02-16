@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { ToastContainer, toast } from "react-toastify";
 import styled from "styled-components";
 import { backend_api } from "../../constant";
 
@@ -76,10 +77,11 @@ const CustomerLoginForm = () => {
     gender: "Male",
     date: new Date().toISOString()
   });
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false)
-
+  const [showOtpInput, setShowOtpInput] = useState(false)
+  const [otp, setOtp] = useState()
+  
   useEffect(() => {
     const jwtToken = Cookies.get("customerjwtToken");
     if (jwtToken) {
@@ -91,43 +93,118 @@ const CustomerLoginForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setError(null);
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      const url = isLogin ? `${backend_api}/customerLogin` : `${backend_api}/register`;
-
-      const response = await fetch(url, {
+      const response = await fetch(`${backend_api}/customerLogin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          phoneNumber: formData.phoneNumber,
+          password: formData.password,
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setIsLoading(false)
-        setError(data.error || "An error occurred. Please try again.");
+        setIsLoading(false);
+        toast.error(data.error || "Invalid credentials, please try again.");
         return;
+      }else{
+        toast.success("Login Successfully")
+        localStorage.setItem("customer", JSON.stringify(data.user));
+        Cookies.set("customerjwtToken", data.jwtToken, { expires: 1 });
+        navigate("/home");
       }
 
-      localStorage.setItem("customer", JSON.stringify(data.user));
-      Cookies.set("customerjwtToken", data.jwtToken, { expires: 1 });
-      navigate("/home");
+      
     } catch (error) {
-      setIsLoading(false)
-      setError("Something went wrong. Please try again.");
+      setIsLoading(false);
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
+  const completeSignup = async () => {
+    try {
+        const response = await fetch(`${backend_api}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            toast.success("Signup successful! You can now login.");
+            setIsLogin(true);
+        } else {
+            toast.error(data.error || "Signup failed.");
+        }
+    } catch (error) {
+        toast.error("Something went wrong. Please try again.");
+    }
+};
+
+
+  const handleVerifyOtp = async () => {
+    setIsLoading(true);
+
+    try {
+        const response = await fetch(`${backend_api}/verify-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phoneNumber: formData.phoneNumber, otp }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            toast.success("OTP verified! Signing up...");
+            await completeSignup(); // Proceed with signup
+        } else {
+            toast.error("Invalid OTP. Please try again.");
+        }
+    } catch (error) {
+        toast.error("Something went wrong.");
+    }
+    setIsLoading(false);
+};
+
+
+  // Separate method for signup
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+        const response = await fetch(`${backend_api}/send-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phoneNumber: formData.phoneNumber }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            toast.success("OTP sent to your phone number");
+            setShowOtpInput(true); // Show OTP input field
+        } else {
+            toast.error(data.error || "Failed to send OTP");
+        }
+    } catch (error) {
+        setIsLoading(false);
+        toast.error("Something went wrong. Please try again.");
+    }
+};
+
+
   return (
+    <>
     <Container>
       <FormWrapper>
         <h2>{isLogin ? "Customer Login" : "Customer Signup"}</h2>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={isLogin ? handleLogin : handleSignup}>
           {!isLogin && (
             <Input
               type="text"
@@ -154,6 +231,21 @@ const CustomerLoginForm = () => {
             onChange={handleChange}
             required
           />
+          {showOtpInput && (
+  <>
+    <Input
+      type="text"
+      name="otp"
+      placeholder="Enter OTP"
+      value={otp}
+      onChange={(e) => setOtp(e.target.value)}
+      required
+    />
+    <Button onClick={handleVerifyOtp}>
+      {isLoading ? "Verifying..." : "Verify OTP"}
+    </Button>
+  </>
+)}
           {!isLogin && (
             <Select name="gender" value={formData.gender} onChange={handleChange} required>
               <option value="Male">Male</option>
@@ -168,6 +260,8 @@ const CustomerLoginForm = () => {
         </SwitchButton>
       </FormWrapper>
     </Container>
+    <ToastContainer />
+    </>
   );
 };
 

@@ -32,6 +32,8 @@ function Recharge() {
         console.log(typeof(amount))
 
         try {
+            console.log(customer);
+            
             const response = await fetch(backend_api+"/api/recharge", {
                 method: "POST",
                 headers: {
@@ -54,7 +56,7 @@ function Recharge() {
                 setCustomer(updatedCustomer);
                 localStorage.setItem("customer", JSON.stringify(updatedCustomer));
 
-                navigate("/payment");
+                navigate("/home");
             } else {
                 alert(data.message || "Recharge failed. Please try again.");
             }

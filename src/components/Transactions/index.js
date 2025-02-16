@@ -1,83 +1,84 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import SidebarContainer from "../Sidebar";
-
-const TransactionPage = () => {
-  const transactions = [
-    { id: 1, type: "Credit", amount: 2000, date: "2024-02-05", description: "Recharge" },
-    { id: 2, type: "Debit", amount: 1500, date: "2024-02-06", description: "Booking" },
-  ];
-
-  return (
-    <>
-      <SidebarContainer />
-      <Container>
-        <h2>Transaction History</h2>
-        <Table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Date</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((transaction) => (
-              <tr key={transaction.id}>
-                <td>{transaction.id}</td>
-                <td className={transaction.type === "Credit" ? "credit" : "debit"}>
-                  {transaction.type}
-                </td>
-                <td>${transaction.amount.toFixed(2)}</td>
-                <td>{transaction.date}</td>
-                <td>{transaction.description}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Container>
-    </>
-  );
-};
+import { backend_api } from "../../constant";
 
 const Container = styled.div`
-  margin: 80px auto;
-  width: 90%;
-  max-width: 800px;
-  text-align: center;
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-
-  th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
+const Title = styled.h2`
     text-align: center;
-  }
-
-  th {
-    background: #007bff;
-    color: white;
-  }
-
-  .credit {
-    color: green;
-    font-weight: bold;
-  }
-
-  .debit {
-    color: red;
-    font-weight: bold;
-  }
+    color: #333;
 `;
 
-export default TransactionPage;
+const List = styled.ul`
+    list-style: none;
+    padding: 0;
+`;
+
+const ListItem = styled.li`
+    background: ${(props) => (props.type === "credit" ? "#d4edda" : "#f8d7da")};
+    color: ${(props) => (props.type === "credit" ? "#155724" : "#721c24")};
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+const SmallText = styled.small`
+    color: #666;
+`;
+
+function TransactionHistory() {
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const customer = JSON.parse(localStorage.getItem("customer"));
+
+    useEffect(() => {
+        fetch(`${backend_api}/transactions/${customer._id}`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data)
+                setTransactions(data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Error fetching transactions:", err);
+                setLoading(false);
+            });
+    }, []);
+
+    return (
+        <Container>
+            <Title>Transaction History</Title>
+            {loading ? (
+                <p>Loading...</p>
+            ) : (
+                <List>
+                    {transactions.length === 0 ? 
+                        <p style={{"textAlign":"center"}}>No Transactions Found</p>
+                    :
+                        transactions.map((txn, index) => (
+                            <ListItem key={index} type={txn.type}>
+                                <div>
+                                    <strong>{txn.type.toUpperCase()}</strong>: ${txn.amount} - {txn.description}
+                                </div>
+                                <SmallText>{new Date(txn.timestamp).toLocaleString()}</SmallText>
+                            </ListItem>
+                        ))
+                    }
+                    
+                </List>
+            )}
+        </Container>
+    );
+}
+
+export default TransactionHistory;

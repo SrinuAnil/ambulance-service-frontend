@@ -49,6 +49,9 @@ const SidebarContainer = () => {
             <Link to="/account">Account</Link>
           </li>
           <li>
+            <Link to="/recharge">Recharge</Link>
+          </li>
+          <li>
             <Link to="/transactions">Transactions</Link>
           </li>
           <li>

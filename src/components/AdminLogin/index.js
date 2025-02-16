@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "./styles.css";
 import { backend_api } from "../../constant";
@@ -7,8 +8,6 @@ import { backend_api } from "../../constant";
 function AdminLogin() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(false)
 
     const navigate = useNavigate();
@@ -22,14 +21,14 @@ function AdminLogin() {
 
     const onSubmitSuccess = (jwtToken) => {
         setIsLoading(false)
+        toast.success("Logged in successfully!");
         Cookies.set("admin_jwt_token", jwtToken, { expires: 30, path: "/" });
         navigate("/dashboard");
     };
 
     const onSubmitFailure = (errorMsg) => {
-        setIsError(true);
         setIsLoading(false)
-        setError(errorMsg || "Invalid credentials.");
+        toast.error(errorMsg || "Invalid credentials.");
         setUsername("");
         setPassword("");
     };
@@ -37,8 +36,7 @@ function AdminLogin() {
     const handleLogin = async (e) => {
         e.preventDefault();
         if (!username || !password) {
-            setError("All fields are required.");
-            setIsError(true);
+            toast.error("All fields are required.");
             return;
         }
 
@@ -66,6 +64,7 @@ function AdminLogin() {
     };
 
     return (
+        <>
         <div className="loginPage">
             <div className="cardContainer">
                 <h2 className="loginTitle">Admin Login</h2>
@@ -90,13 +89,14 @@ function AdminLogin() {
                             placeholder="Enter Password"
                         />
                     </div>
-                    {isError && <p className="errorMessage">{error}</p>}
                     <button className="loginButton" type="submit" disabled={isLoading}>
                     {isLoading ? "Processing..." : "Login"}
                 </button>
                 </form>
             </div>
         </div>
+        <ToastContainer />
+        </>
     );
 }
 

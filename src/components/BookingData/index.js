@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import SidebarContent from '../Sidebar';
+import SidebarContent from "../Sidebar";
+import { backend_api } from "../../constant";
 
 const Container = styled.div`
   width: 90%;
@@ -42,16 +43,6 @@ const Table = styled.table`
     background: #ddd;
   }
 
-  .credit {
-    color: green;
-    font-weight: bold;
-  }
-
-  .debit {
-    color: red;
-    font-weight: bold;
-  }
-
   @media (max-width: 768px) {
     th, td {
       padding: 8px;
@@ -68,43 +59,113 @@ const Table = styled.table`
 `;
 
 const BookingPage = () => {
-  const bookings = [
-    { id: 1, ambulanceName: "City Emergency", amount: 1500, date: "2024-02-05", from: "Downtown Hospital", to: "Green Valley Clinic" },
-    { id: 2, ambulanceName: "Rapid Response", amount: 1800, date: "2024-02-06", from: "Sunrise Apartments", to: "Central Health Center" },
-    { id: 3, ambulanceName: "LifeCare Express", amount: 2000, date: "2024-02-07", from: "Old Town", to: "Metro City Hospital" },
-  ];
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const user = localStorage.getItem("customer");
+        if (!user) {
+          setError("User not found. Please log in.");
+          setLoading(false);
+          return;
+        }
+  
+        const userId = JSON.parse(user)._id;
+        const response = await fetch(`${backend_api}/user/bookings?userId=${userId}`);
+        const data = await response.json();
+        console.log("Raw Data:", data);
+  
+        const formattedData = data.map((booking) => {
+          let selectedHospital, ambulance, address;
+          
+          try {
+            selectedHospital = JSON.parse(JSON.parse(booking.selectedHospital)).name || "Unknown Hospital";
+          } catch (error) {
+            console.error("Error parsing selectedHospital:", error);
+            selectedHospital = "Unknown Hospital";
+          }
+  
+          try {
+            ambulance = JSON.parse(booking.ambulanceDetails).name || "Unknown Ambulance";
+          } catch (error) {
+            console.error("Error parsing ambulanceDetails:", error);
+            ambulance = "Unknown Ambulance";
+          }
+  
+          try {
+            address = JSON.parse(JSON.parse(booking.address)).pincode || "Unknown Pincode";
+          } catch (error) {
+            console.error("Error parsing address:", error);
+            address = "Unknown Pincode";
+          }
+  
+          return {
+            id: booking._id,
+            username: booking.username,
+            selectedHospital,
+            ambulance,
+            amount: booking.totalPrice,
+            date: new Date(booking.timestamp).toLocaleString(),
+            address,
+            paymentMethod: booking.payMethod,
+          };
+        });
+  
+        console.log("Formatted Data:", formattedData);
+        setBookings(formattedData);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching booking data:", err);
+        setError("Error fetching booking data.");
+        setLoading(false);
+      }
+    };
+  
+    fetchBookings();
+  }, []);
+  
+  
 
   return (
     <>
       <SidebarContent />
       <Container>
         <h2>Booking History</h2>
-        <TableWrapper>
-          <Table>
-            <thead>
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p style={{ color: "red" }}>{error}</p>
+        ) : bookings.length === 0 ? (
+          <p>No bookings found.</p>
+        ) : (
+          <TableWrapper>
+            <Table>
+              <thead>
               <tr>
-                <th>ID</th>
-                <th>Ambulance</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>From</th>
-                <th>To</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((booking) => (
-                <tr key={booking.id}>
-                  <td>{booking.id}</td>
-                  <td>{booking.ambulanceName}</td>
-                  <td>${booking.amount.toFixed(2)}</td>
-                  <td>{booking.date}</td>
-                  <td>{booking.from}</td>
-                  <td>{booking.to}</td>
+                  <th>Date</th>
+                  <th>Ambulance</th>
+                  <th>Amount</th>
+                  <th>Location</th>
+                  <th>Payment Method</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        </TableWrapper>
+              </thead>
+              <tbody>
+                {bookings.map((booking) => (
+                  <tr key={booking.id}>
+                  <td>{booking.date}</td>
+                  <td>{booking.ambulance}</td>
+                  <td>${booking.amount.toFixed(2)}</td>
+                  <td>{booking.selectedHospital}</td>
+                  <td>{booking.paymentMethod}</td>
+                </tr>
+                ))}
+              </tbody>
+            </Table>
+          </TableWrapper>
+        )}
       </Container>
     </>
   );
